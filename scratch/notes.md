@@ -2,3 +2,5 @@ npm i @nestjs/common@7.6.17 @nestjs/core@7.6.17 @nestjs/platform-express@7.6.17 
 
 nest generate module messages
 nest generate controller messages/messages --flat
+nest g service messages
+nest g controller computer
