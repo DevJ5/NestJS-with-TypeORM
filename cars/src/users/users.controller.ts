@@ -9,16 +9,24 @@ import {
   Patch,
   Post,
   Query,
+  Session,
   UseInterceptors,
+  Request,
+  UseGuards,
 } from '@nestjs/common';
+import { ColdObservable } from 'rxjs/internal/testing/ColdObservable';
+import { AuthGuard } from '../guards/auth.guard';
 import {
   Serialize,
   SerializeInterceptor,
-} from 'src/interceptors/serialize.interceptor';
+} from '../interceptors/serialize.interceptor';
 import { AuthService } from './auth.service';
+import { CurrentUser } from './decorators/current-user.decorator';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { UserDto } from './dtos/user.dto';
+import { CurrentUserInterceptor } from './interceptors/current-user.interceptor';
+import { User } from './user.entity';
 import { UsersService } from './users.service';
 
 @Serialize(UserDto)
@@ -29,19 +37,55 @@ export class UsersController {
     private authService: AuthService,
   ) {}
 
+  @Get('/colors/:color')
+  setColor(@Param('color') color: string, @Session() session: any) {
+    console.log(session);
+    session.color = color;
+  }
+
+  @Get('/colors')
+  getcolor(@Session() session: any) {
+    console.log(session);
+    return session.color;
+  }
+
+  // @Get('/whoami')
+  // whoAmI(@Session() session: any) {
+  //   console.log(session.userId);
+  //   return this.usersService.findOne(parseInt(session.userId));
+  // }
+
+  @Get('/whoami')
+  @UseGuards(AuthGuard)
+  // @UseInterceptors(CurrentUserInterceptor) -> This is moved to the APP_INTERCEPTOR so all modules use it
+  whoAmI(@Request() request: Request, @CurrentUser() user: User) {
+    // CurrentUser is a custom decorator to make it more explicit, Request can also be used:
+    return user;
+    return request['currentUser'];
+  }
+
   @Post('/signup')
-  createUser(@Body() body: CreateUserDto) {
-    return this.authService.signup(body.email, body.password);
+  async createUser(@Body() body: CreateUserDto, @Session() session: any) {
+    const user = await this.authService.signUp(body.email, body.password);
+    session.userId = user.id;
+    return user;
   }
 
   @Post('/signin')
-  signIn(@Body() body: CreateUserDto) {
-    return this.authService.signIn(body.email, body.password);
+  async signIn(@Body() body: CreateUserDto, @Session() session: any) {
+    const user = await this.authService.signIn(body.email, body.password);
+    session.userId = user.id;
+    return user;
   }
 
-  // @UseInterceptors(ClassSerializerInterceptor)
-  // @UseInterceptors(new SerializeInterceptor(UserDto))
-  // @Serialize(UserDto)
+  @Post('/signout')
+  signOut(@Session() session: any) {
+    session.userId = null;
+  }
+
+  // Nest docs approach: @UseInterceptors(ClassSerializerInterceptor)
+  // Dynamic approach: @UseInterceptors(new SerializeInterceptor(UserDto))
+  // Custom decorator to shorten syntax: @Serialize(UserDto)
   @Get('/:id')
   async findUser(@Param('id') id: string) {
     const user = await this.usersService.findOne(parseInt(id));

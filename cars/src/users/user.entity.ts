@@ -1,10 +1,12 @@
 import { Exclude } from 'class-transformer';
+import { Report } from 'src/reports/report.entity';
 import {
   AfterInsert,
   AfterRemove,
   AfterUpdate,
   Column,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -17,8 +19,12 @@ export class User {
   email: string;
 
   @Column()
-  @Exclude()
+  // @Exclude(), Nest docs approach doesnt work when we want to return
+  // different properties of the User entity for different routes.
   password: string;
+
+  @OneToMany(() => Report, (report) => report.user)
+  reports: Report[];
 
   // Hooks are only called when an entity is first created before saving
   @AfterInsert()
