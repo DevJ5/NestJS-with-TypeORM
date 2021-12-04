@@ -48,7 +48,7 @@ export class UsersController {
     console.log(session);
     return session.color;
   }
-
+  // TODO:
   // @Get('/whoami')
   // whoAmI(@Session() session: any) {
   //   console.log(session.userId);
