@@ -13,18 +13,20 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderWithScheme('Token'),
-      ignoreExpiration: false,
+      ignoreExpiration: true,
       secretOrKey: process.env.SECRET,
     });
   }
 
   async validate(payload: AuthPayload) {
+    console.log(payload);
     const user = await this.userRepo.findOne({
       where: { username: payload.username },
     });
     if (!user) {
       throw new UnauthorizedException();
     }
+    console.log('validate', user);
     return user;
   }
 }
