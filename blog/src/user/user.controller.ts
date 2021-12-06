@@ -1,7 +1,9 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  Param,
   Put,
   UseGuards,
   ValidationPipe,
@@ -29,5 +31,11 @@ export class UserController {
     @Body(new ValidationPipe({ whitelist: true })) data: UpdateUserDto,
   ) {
     return this.userService.updateUser(username, data);
+  }
+
+  @Delete(':id')
+  @UseGuards(AuthGuard())
+  delete(@Param('id') id: string) {
+    return this.userService.delete(parseInt(id));
   }
 }

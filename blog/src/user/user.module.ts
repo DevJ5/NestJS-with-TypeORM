@@ -6,9 +6,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { PassportModule } from '@nestjs/passport';
 import { UserEntity } from 'src/entities/user.entity';
 import { AuthModule } from 'src/auth/auth.module';
+import { ArticleEntity } from 'src/entities/article.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([UserEntity]), AuthModule],
+  imports: [TypeOrmModule.forFeature([UserEntity, ArticleEntity]), AuthModule],
   providers: [UserService],
   controllers: [UserController, ProfileController],
 })

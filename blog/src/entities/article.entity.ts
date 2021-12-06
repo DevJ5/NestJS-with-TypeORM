@@ -34,7 +34,9 @@ export class ArticleEntity extends AbstractEntity {
   @RelationCount((article: ArticleEntity) => article.favoritedBy)
   favoritesCount: number;
 
-  @ManyToOne((type) => UserEntity, (user) => user.articles, { eager: true })
+  @ManyToOne((type) => UserEntity, (user) => user.articles, {
+    nullable: false,
+  })
   author: UserEntity;
 
   @Column('simple-array')
