@@ -83,4 +83,20 @@ export class ArticleController {
     const article = await this.articleService.deleteArticle(slug, user);
     return { article };
   }
+
+  @Post('/:slug/favorite')
+  @UseGuards(AuthGuard())
+  async favoriteArticle(@User() user: UserEntity, @Param('slug') slug: string) {
+    const article = this.articleService.favoriteArticle(user, slug);
+    return { article };
+  }
+
+  @Delete('/:slug/favorite')
+  async unfavoriteArticle(
+    @User() user: UserEntity,
+    @Param('slug') slug: string,
+  ) {
+    const article = await this.articleService.unfavoriteArticle(user, slug);
+    return { article };
+  }
 }

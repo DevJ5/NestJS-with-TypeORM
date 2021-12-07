@@ -88,4 +88,25 @@ export class ArticleService {
     }
     await this.articleRepo.softRemove(article);
   }
+
+  async favoriteArticle(user: UserEntity, slug: string) {
+    const article = await this.findBySlug(slug);
+    article.favoritedBy.push(user);
+    await article.save();
+
+    // Without eager and from the other side
+    // user = await this.userRepo.findOne(user.id, {
+    //   relations: ['favorites'],
+    // });
+    // user.favorites.push(article);
+    // await user.save();
+  }
+
+  async unfavoriteArticle(user: UserEntity, slug: string) {
+    const article = await this.findBySlug(slug);
+    article.favoritedBy = article.favoritedBy.filter(
+      (fav) => fav.id !== user.id,
+    );
+    await article.save();
+  }
 }
