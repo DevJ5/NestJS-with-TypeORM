@@ -11,6 +11,7 @@ import {
 } from 'typeorm';
 import { AbstractEntity } from './abstract-entity';
 import { ArticleEntity } from './article.entity';
+import { CommentEntity } from './comment.entity';
 
 @Entity()
 export class UserEntity extends AbstractEntity {
@@ -52,6 +53,9 @@ export class UserEntity extends AbstractEntity {
 
   @ManyToMany((type) => ArticleEntity, (article) => article.favoritedBy)
   favorites: ArticleEntity[];
+
+  @OneToMany(() => CommentEntity, (comment) => comment.author)
+  comments: CommentEntity[];
 
   @BeforeInsert()
   async hashPassword() {

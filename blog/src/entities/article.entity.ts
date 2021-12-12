@@ -7,11 +7,13 @@ import {
   JoinColumn,
   RelationCount,
   JoinTable,
+  OneToMany,
 } from 'typeorm';
 import { instanceToPlain } from 'class-transformer';
 import * as slugify from 'slug';
 import { AbstractEntity } from './abstract-entity';
 import { UserEntity } from './user.entity';
+import { CommentEntity } from './comment.entity';
 
 @Entity()
 export class ArticleEntity extends AbstractEntity {
@@ -41,6 +43,9 @@ export class ArticleEntity extends AbstractEntity {
 
   @Column('simple-array')
   tagList: string[];
+
+  @OneToMany(() => CommentEntity, (comment) => comment.article)
+  comments: CommentEntity[];
 
   @BeforeInsert()
   generateSlug() {
